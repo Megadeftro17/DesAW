@@ -1,0 +1,9 @@
+##[[Habilitar - Deshabilitar configuraciones apache2]]
+	- Habilitar --> a2enconf  [archivo] --> (a2)(en)(conf) [archivo]
+	- Deshabilitar --> a2disconf [archivo] --> (a2)(dis)(conf) [archivo]
+
+## PARA PERSONALIZAR UN ARCHIVO (por ejemplo el de erorr)
+/etc/apache2/conf-available --> creas fichero --> editas fichero --> etc/apache2/conf-enabled --> a2enconf [archivo] (El archivo debe estar en /var/www/html para que funcione y reiniciar con "sudo systemctl reload apache2"
+
+## Para redirigir al usuario a la página que yo quiero desde otra
+/etc/apache2/conf-available --> miConf.conf (Redirect "/paginas" "/mispaginas") --> reiniciamos apache2
