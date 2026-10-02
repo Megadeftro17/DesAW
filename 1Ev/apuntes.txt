@@ -7,3 +7,28 @@
 
 ## Para redirigir al usuario a la página que yo quiero desde otra
 /etc/apache2/conf-available --> miConf.conf (Redirect "/paginas" "/mispaginas") --> reiniciamos apache2
+
+
+##################### HOSTS VIRTUALES (basados en nombre) #####################
+1. Crear carpeta logs (/var/log/apache2)
+2. Crear carpeta html (/var/www/html)
+3. Copiar 000-conf para hacer fichero personalizado (/etc/apache2/sites-available)
+4. Activar con a2ensite fichero.conf 
+5. Reiniciar sudo systemctl reload apache2
+6. Modificar los hosts con el host deseado (/etc/hosts --> "ip www.sadas.com")
+__Escribe el contenido descargado en la terminal""wget -qO- http://www.alumnos.com""___
+ --> Gracias a ServerName hace que apache2 sepa como relacionar la petición y el fichero conf
+=====================================================================================
+para activar/desactivar Option indixes general en miConf.conf en conf-available
+<Directory /var/www/html>
+	Options -Indexes
+</Directory>
+
+Para activar en uno en concreto en /etc/apache2/sites-available/alumnos.conf
+<Directory /var/www/html/alumnos>
+	Options +Indexes
+</Directory>
+=====================================================================================
+Para que indice.html sea el index principal
+/etc/apache2/sites-available/alumnos.conf
+DirectoryIndex indice.html
