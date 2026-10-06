@@ -10,6 +10,7 @@
 
 
 ##################### HOSTS VIRTUALES (basados en nombre) #####################
+
 1. Crear carpeta logs (/var/log/apache2)
 2. Crear carpeta html (/var/www/html)
 3. Copiar 000-conf para hacer fichero personalizado (/etc/apache2/sites-available)
@@ -18,7 +19,10 @@
 6. Modificar los hosts con el host deseado (/etc/hosts --> "ip www.sadas.com")
 __Escribe el contenido descargado en la terminal""wget -qO- http://www.alumnos.com""___
  --> Gracias a ServerName hace que apache2 sepa como relacionar la petición y el fichero conf
+ --> Gracias a ServerAlias hace que nos redirija a la página (sin www) !!HAY QUE AÑADIR LA MISMA IP en /etc/hosts!!
+
 =====================================================================================
+
 para activar/desactivar Option indixes general en miConf.conf en conf-available
 <Directory /var/www/html>
 	Options -Indexes
@@ -28,7 +32,9 @@ Para activar en uno en concreto en /etc/apache2/sites-available/alumnos.conf
 <Directory /var/www/html/alumnos>
 	Options +Indexes
 </Directory>
+
 =====================================================================================
+
 Para que indice.html sea el index principal
 /etc/apache2/sites-available/alumnos.conf
 DirectoryIndex indice.html

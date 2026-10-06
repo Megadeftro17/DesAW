@@ -1,0 +1,26 @@
+Puerto --> 	<VirtualHost *:80>
+        		# Nombre del servidor
+Nombre -->    		ServerName www.alumnos.com
+			# Alias sin www para que funcione igual 
+Alias -->		ServerAlias alumnos.com
+
+Admin -->		ServerAdmin webmaster@localhost
+DocumentRoot -->	DocumentRoot /var/www/html/alumnos
+        		# Pagina de inicio es:  
+Index -->		DirectoryIndex indice.html
+
+        		#Error document
+Errores -->		ErrorDocument 404 /error404.html
+
+			#Redirecion
+Redireccion -->		Redirect "/calendario" "http://alumnos.com/indice.html"
+
+Error log -->	        ErrorLog ${APACHE_LOG_DIR}/alumnos/error.log
+Errores pers-->		CustomLog ${APACHE_LOG_DIR}/alumnos/access.log combined
+
+		        #Directorio para mostrar los indices de alumnos
+Mostrar indices -->	<Directory /var/www/html/alumnos>
+                		Options +Indexes        
+        		</Directory>
+		</VirtualHost>
+
