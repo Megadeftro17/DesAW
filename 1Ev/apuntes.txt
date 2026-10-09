@@ -21,7 +21,7 @@ __Escribe el contenido descargado en la terminal""wget -qO- http://www.alumnos.c
  --> Gracias a ServerName hace que apache2 sepa como relacionar la petición y el fichero conf
  --> Gracias a ServerAlias hace que nos redirija a la página (sin www) !!HAY QUE AÑADIR LA MISMA IP en /etc/hosts!!
 
-=====================================================================================
+=============================================================================================================================
 
 para activar/desactivar Option indixes general en miConf.conf en conf-available
 <Directory /var/www/html>
@@ -33,8 +33,39 @@ Para activar en uno en concreto en /etc/apache2/sites-available/alumnos.conf
 	Options +Indexes
 </Directory>
 
-=====================================================================================
+=============================================================================================================================
 
 Para que indice.html sea el index principal
 /etc/apache2/sites-available/alumnos.conf
 DirectoryIndex indice.html
+
+=============================================================================================================================
+CIFRADO
+- Crear dir en /etc/apache2
+- (Introducir usuarios con passwd) htpasswd -c  /etc/apache2/seguridad/.usuarios david
+((el -c solo es necesario la primera vez para que cree el archivo, así no es necesario crear el archivo de antemano))
+- Para configurar el directorio seguro es en sites-available (en este caso departamentos)
+
+<Directory /var/www/html/departamentos>
+                AuthType Basic
+                AuthName "Escriba su usuario y password"
+                AuthUserFile /etc/apache2/seguridad/.usuarios
+                Required valid-user
+</Directory>
+
+- Para comprobar con curl => curl --user tere: http://www.departamentos.com/indice.html
+- Para comprobar con weget => wget -qO- --user="tere" --password="" http://www.departamentos.com/indice.html
+---------------------------------------------------------------------------------------------------------------
+Para grupos
+- Hay que crear el grupo e introducir usuarios en .grupos (grupo: usuario1 usuario2...)
+- en sites-available/departamentos.conf:
+
+<Directory /var/www/html/departamentos>
+	AuthType Basic
+	AuthName "Escriba su usuario y password"
+	AuthUserFile /etc/apache2/seguridad/.usuarios
+        AuthGroupFile /etc/apache2/seguridad/.grupos
+        Require group departamentos
+</Directory>
+
+IMPORTANTE!!! => HABILITAR con "a2enmod authz_groupfile"
