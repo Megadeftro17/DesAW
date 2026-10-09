@@ -40,7 +40,8 @@ Para que indice.html sea el index principal
 DirectoryIndex indice.html
 
 =============================================================================================================================
-CIFRADO
+					CIFRADO
+=============================================================================================================================
 - Crear dir en /etc/apache2
 - (Introducir usuarios con passwd) htpasswd -c  /etc/apache2/seguridad/.usuarios david
 ((el -c solo es necesario la primera vez para que cree el archivo, así no es necesario crear el archivo de antemano))
@@ -56,7 +57,8 @@ CIFRADO
 - Para comprobar con curl => curl --user tere: http://www.departamentos.com/indice.html
 - Para comprobar con weget => wget -qO- --user="tere" --password="" http://www.departamentos.com/indice.html
 ---------------------------------------------------------------------------------------------------------------
-Para grupos
+					Para grupos
+---------------------------------------------------------------------------------------------------------------
 - Hay que crear el grupo e introducir usuarios en .grupos (grupo: usuario1 usuario2...)
 - en sites-available/departamentos.conf:
 
