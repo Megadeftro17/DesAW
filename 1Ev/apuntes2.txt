@@ -21,6 +21,17 @@ Errores pers-->		CustomLog ${APACHE_LOG_DIR}/alumnos/access.log combined
 		        #Directorio para mostrar los indices de alumnos
 Mostrar indices -->	<Directory /var/www/html/alumnos>
                 		Options +Indexes        
+                		# Quitar acceso a una determinada ip
+                		<RequireAll>
+		                        Require all granted
+               			        Require not ip 10.6.9.37
+                		</RequireAll>
+        		        # Permite acceso a todos los cambios en .htaccess
+                		AllowOverride All
         		</Directory>
+
+
+		        # Para admitir SOLO esa ip y ninguna mas
+        		Require ip 10.6.9.37
 		</VirtualHost>
 

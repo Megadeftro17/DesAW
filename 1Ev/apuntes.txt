@@ -40,7 +40,7 @@ Para que indice.html sea el index principal
 DirectoryIndex indice.html
 
 =============================================================================================================================
-					CIFRADO
+					AUTENTICAR
 =============================================================================================================================
 - Crear dir en /etc/apache2
 - (Introducir usuarios con passwd) htpasswd -c  /etc/apache2/seguridad/.usuarios david
@@ -71,3 +71,14 @@ DirectoryIndex indice.html
 </Directory>
 
 IMPORTANTE!!! => HABILITAR con "a2enmod authz_groupfile"
+
+
+=============================================================================================================================
+Para acceder a puertos (Puente)
+con hosts si pongo la ip de la máquina puede acceder a la máquina
+==> Para que acceda solamente una IP es Require ip [ip]
+---------------------------------------------------------------------------------------------------------------------
+.htacces está en /etc/apache2/apache2.com
+- Para mostrar el error que yo quiera en vez de virtualHost en un directorio (error/error404.html)
+-- AllowOverride All -- => Permite todas las directivas que quieras
+
