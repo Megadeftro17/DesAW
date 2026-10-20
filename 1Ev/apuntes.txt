@@ -56,9 +56,9 @@ DirectoryIndex indice.html
 
 - Para comprobar con curl => curl --user tere: http://www.departamentos.com/indice.html
 - Para comprobar con weget => wget -qO- --user="tere" --password="" http://www.departamentos.com/indice.html
----------------------------------------------------------------------------------------------------------------
-					Para grupos
----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
+						Para grupos
+-----------------------------------------------------------------------------------------------------------------------------
 - Hay que crear el grupo e introducir usuarios en .grupos (grupo: usuario1 usuario2...)
 - en sites-available/departamentos.conf:
 
@@ -77,8 +77,19 @@ IMPORTANTE!!! => HABILITAR con "a2enmod authz_groupfile"
 Para acceder a puertos (Puente)
 con hosts si pongo la ip de la máquina puede acceder a la máquina
 ==> Para que acceda solamente una IP es Require ip [ip]
----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 .htacces está en /etc/apache2/apache2.com
 - Para mostrar el error que yo quiera en vez de virtualHost en un directorio (error/error404.html)
 -- AllowOverride All -- => Permite todas las directivas que quieras
+
+
+==============================================================================================================================
+REDIRECCIONAR EL ERROR Y PAGINAS EN .HTACCESS
+==============================================================================================================================
+# Paginas con error 404
+ErrorDocument 404 /erroralumnos/error404.html
+
+# Redireccionar a otras paginas
+Redirect /pruebaRedirect "https://google.com"
+
 
