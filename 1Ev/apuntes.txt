@@ -93,3 +93,45 @@ ErrorDocument 404 /erroralumnos/error404.html
 Redirect /pruebaRedirect "https://google.com"
 
 
+==============================================================================================================================
+						SSL
+==============================================================================================================================
+-> Habilitar ssl (a2enmod ssl)
+-> sites-available (default-ssl.conf) --> Primer certificado publico, segundo privado
+
+HACER QUE FUNCIONE EN UNO DETERMINADO
+--> En la configuración (alumnos.conf) añadir el puerto cambiándolo <VirtualHost *:443>
+--> Añadir las claves         	SSLEngine on
+        			SSLCertificateFile      /etc/ssl/...
+        			SSLCertificateKeyFile   /etc/ssl/…
+--> Comentar el puerto 80
+--> (curl -k https://....) muestra la página sin el error de la key
+--> (wget -qO- --no-check-certificate https://...) muestra página también
+___________________________________________________________________________________________________________________________________
+sudo openssl req -x509 -nodes -days 1460 -newkey rsa:2048 -keyout sapache.key -out sapache.crt
+
+alumno@alumno-VirtualBox:/etc/ssl$ sudo su
+root@alumno-VirtualBox:/etc/ssl# cd private
+root@alumno-VirtualBox:/etc/ssl/private# ls
+ssl-cert-snakeoil.key
+root@alumno-VirtualBox:/etc/ssl/private# ls -la
+total 12
+drwx--x--- 2 root ssl-cert 4096 sep  9  2024 .
+drwxr-xr-x 4 root root     4096 oct  6 08:34 ..
+-rw-r----- 1 root ssl-cert 1704 sep  9  2024 ssl-cert-snakeoil.key
+root@alumno-VirtualBox:/etc/ssl/private# cp ../certs/s
+sapache.crt            sapache.key            ssl-cert-snakeoil.pem  
+root@alumno-VirtualBox:/etc/ssl/private# cp ../certs/sapache.
+sapache.crt  sapache.key  
+root@alumno-VirtualBox:/etc/ssl/private# cp ../certs/sapache.key .
+root@alumno-VirtualBox:/etc/ssl/private# mv ../certs/sapache.key .
+root@alumno-VirtualBox:/etc/ssl/private# ls -la
+total 16
+drwx--x--- 2 root ssl-cert 4096 oct 23 14:02 .
+drwxr-xr-x 4 root root     4096 oct  6 08:34 ..
+-rw------- 1 root root     1704 oct 23 13:58 sapache.key
+-rw-r----- 1 root ssl-cert 1704 sep  9  2024 ssl-cert-snakeoil.key
+
+
+CAMBIAR GRUPO --> chgrp ssl-cert sapache.key 
+CAMBIAR PERMISOS --> chmod 640 sapache.key 
