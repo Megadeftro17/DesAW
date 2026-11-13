@@ -1,0 +1,62 @@
+# COPIA POR SI FALLA AL CONFIGURAR EL CONF
+sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.copia
+
+# ABRIR Y BORRAR TODO PARA CONFIGURARLO DESDE 0
+sudo nano /etc/vsftpd.conf
+===================================================================================
+- # Primera directiva LISTEN
+- listen=YES
+- 
+- # Mensaje de Bienvenida
+- ftpd_banner=Bienvenido al FTP del servidor web de Jorge
+- 
+- # Numero maximo de clientes que se pueden conectar simultaneamente
+- max_clients=5
+- # Primera directiva LISTEN
+- listen=YES
+- 
+- # Mensaje de Bienvenida
+- ftpd_banner=Bienvenido al FTP del servidor web de Jorge
+- 
+- # Numero maximo de clientes que se pueden conectar simultaneamente
+- max_clients=3
+- 
+- # Se podra escribir en el servidor
+- #write_enable=YES
+- 
+- # Habilita el usuario invitado: anonymous
+- anonymous_enable=YES
+- 
+- # Habilitar usuarios locales
+- local_enable=YES
+- 
+- # Todos los usuarios locales deben estar enjaulados en su directorio root
+- chroot_local_user=YES
+- allow_writeable_chroot=YES
+- 
+- # Quiero enjaular a todos menos a teresa
+- chroot_list_enable=YES
+- 
+- # Denegar a ciertos usuarios locales poder conectarse (DENIEGA A ALUMNO y no a los demas)
+- userlist_enable=YES
+- userlist_deny=YES
+- # Fichero de usuarios denegados
+- userlist_file=/etc/vsftpd.denied_users
+===================================================================================
+
+# AÑADIR UN USUARIO
+sudo adduser teresa
+
+# Crear documento y añadir dentro el nombre de el(los) usuario(s)
+sudo nano /etc/vsftpd.chroot_list
+
+# Denegar usuarios (crear fichero y escribir el usuario a denegar)
+sudo nano /etc/vsftpd.denied_users
+
+
+# Habilitar
+(DA FALLO)
+ftp> put teresa.html carpeta/teresita.html
+local: teresa.html remote: carpeta/teresita.html
+229 Entering Extended Passive Mode (|||22697|)
+553 Could not create file.
