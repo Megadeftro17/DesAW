@@ -42,6 +42,9 @@ sudo nano /etc/vsftpd.conf
 - userlist_deny=YES
 - # Fichero de usuarios denegados
 - userlist_file=/etc/vsftpd.denied_users
+- 
+- # Configurar usuarios
+- user_config_dir=/etc/vsftpd/users
 ===================================================================================
 
 # AÑADIR UN USUARIO
@@ -53,10 +56,27 @@ sudo nano /etc/vsftpd.chroot_list
 # Denegar usuarios (crear fichero y escribir el usuario a denegar)
 sudo nano /etc/vsftpd.denied_users
 
+===================================================================================
 
-# Habilitar
-(DA FALLO)
-ftp> put teresa.html carpeta/teresita.html
-local: teresa.html remote: carpeta/teresita.html
-229 Entering Extended Passive Mode (|||22697|)
-553 Could not create file.
+Crear fichero para un usuario concreto CON SU NOMBRE en /etc/vsftpd/users
+- # No tiene permiso de escritura pero los demás sí.
+- write_enable=NO
+- # Para que por defecto al conectarse vaya aqui
+- local_root=/var/www/HTML
+
+___ PARA QUE DEJE A TERESA HACER ESCRITURA ___
+# Añadir el usuario teresa al grupo www-data
+sudo usermod -aG www-data teresa
+
+# Cambiar el propietario y grupo de la carpeta a www-data
+sudo chown -R www-data:www-data /var/www/html
+
+# Dar permisos de lectura, escritura y ejecución al propietario y al grupo (2775)
+sudo chmod -R 2775 /var/www/HTML
+
+# Comprobar
+groups teresa
+
+# Crear carpeta de prueba
+mkdir carpetaPrueba
+
