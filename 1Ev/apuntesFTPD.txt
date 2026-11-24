@@ -80,3 +80,51 @@ groups teresa
 # Crear carpeta de prueba
 mkdir carpetaPrueba
 
+
+===================================================================================
+
+- FTPS explícito (puerto 21) TLS ES OBLIGATORIO y ftp da la seguridad
+
+- FTPS implícito (puerto 990) seguridad implícita con el puerto
+# Habilita soporte ssl
+ssl_enable=YES
+# Usar SSL Implícito. 
+implicit_ssl=YES
+# Puerto para ssl implícito
+listen_port=990
+# No para anónimos
+allow_anon_ssl=NO
+# Forzar usuarios locales a usar ssl para transferir datos
+force_local_data_ssl=YES
+# Forzar usuarios locales a usar ssl para transferir contraseña force_local_logins_ssl=YES
+# Protocolos permitidos
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+# The default SSL ciphers is DES-CBC3-SHA, but FileZilla regards
+# it as unsafe and rejects it. Therefore you should modify it.
+ssl_ciphers=HIGH
+# Certificado
+rsa_cert_file=/etc/vsftpd/vsftpd.pem
+_________________________________________________________________________
+FileZilla -> Ctrl+s -> Cifrado implícito -> Poner IP -> Puerto a escuchar
+_________________________________________________________________________
+
+===================================================================================
+				SSH
+===================================================================================
+Instalar ssh apt-get install openssh-server
+para ver si se puede conectar ssh alumno@localhost
+
+VER PUERTOS QUE ESCUCHAN (sudo netstat -ptan)
+
+IMPORTANTE en /etc/ssh los ficheros son <<ssh_config>> y <<sshd_config>>(es del servidor)
+para configurar todo es necesario que cada cambio hagamos 
+- systemctl daemon-reload
+- systemctl restart ssh.socket
+
+CAMBIAR PUERTO 
+- Port xxxx
+
+CONECTARSE con puerto cambiado
+- sudo ssh -p xxxx alumno@localhost

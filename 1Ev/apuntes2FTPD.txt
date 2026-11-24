@@ -1,0 +1,65 @@
+/etc/vsftpd.conf
+
+#Primera directiva LISTEN
+listen=YES
+
+# Mensaje de Bienvenida
+ftpd_banner=Bienvenido al FTP del servidor web de Jorge
+
+# Numero maximo de clientes que se pueden conectar simultaneamente
+max_clients=3
+
+# Se podra escribir en el servidor
+write_enable=YES
+
+# Habilita el usuario invitado: anonymous
+anonymous_enable=YES
+
+# Habilitar usuarios locales
+local_enable=YES
+
+# Todos los usuarios locales deben estar enjaulados en su directorio root
+chroot_local_user=YES
+allow_writeable_chroot=YES
+
+# Quiero enjaular a todos menos a teresa
+chroot_list_enable=YES
+
+# Denegar a ciertos usuarios locales poder conectarse (DENIEGA A ALUMNO y no a los demas)
+#userlist_enable=YES
+#userlist_deny=YES
+# Fichero de usuarios denegados
+#userlist_file=/etc/vsftpd.denied_users
+
+user_config_dir=/etc/vsftpd/users
+
+
+#IMPLÍCITO
+
+# Habilita soporte ssl
+ssl_enable=YES
+# Usar SSL Implícito. 
+#implicit_ssl=YES
+# Puerto para ssl implícito
+#listen_port=990
+# No para anónimos
+allow_anon_ssl=NO
+# Forzar usuarios locales a usar ssl para transferir datos
+force_local_data_ssl=YES
+# Forzar usuarios locales a usar ssl para transferir contraseña force_local_logins_ssl=YES
+# Protocolos permitidos
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+# The default SSL ciphers is DES-CBC3-SHA, but FileZilla regards
+# it as unsafe and rejects it. Therefore you should modify it.
+ssl_ciphers=HIGH
+# Certificado
+rsa_cert_file=/etc/vsftpd/vsftpd.pem
+
+
+# Explícito comentar estas directiva
+# Usar SSL Implícito. 
+#implicit_ssl=YES
+# Puerto para ssl implícito
+#listen_port=990
