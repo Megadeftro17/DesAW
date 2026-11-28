@@ -1,0 +1,215 @@
+Apuntes de Examen: VSFTPD (FTP / FTPS) y SSH
+###############################################################################################################################################################################
+1. Red y resolución de nombres (/etc/hosts)
+###############################################################################################################################################################################
+
+- En VirtualBox (Servidor): Entra en Configuración $\rightarrow$ Red y cambia Conectado a de NAT a Adaptador puente (Bridged Adapter). Arranca la máquina y mira su IP con:
+#####
+ip a
+#####
+
+- En el PC Cliente (y en el Servidor si lo pide el enunciado): Edita /etc/hosts para asociar la IP de la máquina virtual al nombre del servidor (por ejemplo marte):
+--------------------------------------------------------------------------------------
+sudo nano /etc/hosts --> añadir host "ip nombre" --> comprobar con "ping -c 3 nombre"
+--------------------------------------------------------------------------------------
+
+###############################################################################################################################################################################
+2. Usuarios y permisos de carpetas web (Apache + FTP)
+###############################################################################################################################################################################
+
+-  Crea los usuarios locales necesarios con sudo adduser <usuario> y aplica una de estas dos configuraciones según lo que pida el examen:
+- — Caso A — Cada usuario es dueño de su carpeta y Apache (www-data) solo lee (ej. /var/www/cliente1):
+-----------------------------------------------
+sudo mkdir -p /var/www/cliente1
+sudo chown cliente1:www-data /var/www/cliente1
+sudo chmod 2750 /var/www/cliente1
+-----------------------------------------------
+
+- — Caso B — Uno o varios usuarios escriben dentro de una carpeta de Apache (ej. /var/www/html):
+-----------------------------------------------
+sudo usermod -aG www-data teresa
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 2775 /var/www/html
+-----------------------------------------------
+
+###############################################################################################################################################################################
+3. Servidor VSFTPD (/etc/vsftpd.conf)
+###############################################################################################################################################################################
+
+Preparación del fichero
+Haz copia de seguridad, vacíalo y ábrelo con nano:
+--------------------------------------------------
+sudo cp -n /etc/vsftpd.conf /etc/vsftpd.conf.copia
+sudo truncate -s 0 /etc/vsftpd.conf
+sudo nano /etc/vsftpd.conf
+--------------------------------------------------
+
+- Plantilla base limpia (sin SSL)
+(Regla de oro: nunca pongas listen=YES y listen_ipv6=YES activos a la vez, o el servicio falla al arrancar).
+
+----------------------------------------------------------------------------------------------
+# Escucha IPv4 y mensaje de bienvenida
+listen=YES
+ftpd_banner=Bienvenido al servidor FTP
+max_clients=5
+
+# Permisos globales y tipos de usuario
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+
+# Control de acceso por lista (cambiar userlist_deny segun el enunciado)
+userlist_enable=YES
+userlist_deny=NO
+userlist_file=/etc/vsftpd.allowed_users
+
+# Jaulas (chroot)
+chroot_local_user=YES
+allow_writeable_chroot=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+# Configuracion individual por usuario
+user_config_dir=/etc/vsftpd/users
+
+# Directivas obligatorias en Ubuntu al partir de fichero vacio
+pam_service_name=vsftpd
+secure_chroot_dir=/var/run/vsftpd/empty
+----------------------------------------------------------------------------------------------
+
+-Cómo adaptar /etc/vsftpd.conf según lo que pida el examen
+--Si el enunciado pide...			-->	Qué debes cambiar o crear
+- - Permitir usuario anónimoCambia 		-->	anonymous_enable=YES (su carpeta por defecto es /srv/ftp)
+- - Lista BLANCA (solo entran X, Y, Z)		-->	userlist_enable=YES y userlist_deny=NO.Crea sudo nano /etc/vsftpd.allowed_users con un usuario por línea.
+- - Lista NEGRA (prohibir entrada a X)		-->	userlist_enable=YES y userlist_deny=YES. Crea sudo nano /etc/vsftpd.denied_users con los usuarios bloqueados
+- - Enjaular a TODOS menos a X			-->	chroot_local_user=YES + chroot_list_enable=YES. Pon a X dentro de /etc/vsftpd.chroot_list (quedará libre)
+- - Enjaular SOLO a X				-->	chroot_local_user=NO + chroot_list_enable=YES. Pon a X dentro de /etc/vsftpd.chroot_list (quedará enjaulado)
+- - Cambiar carpeta inicial a un usuario	-->	Crea sudo mkdir -p /etc/vsftpd/users y sudo nano /etc/vsftpd/users/<usuario> con local_root=/var/www/cliente1
+- - Quitar escritura a un usuario concreto	-->	Crea sudo nano /etc/vsftpd/users/<usuario> y escribe dentro write_enable=NO.
+
+
+
+-  Aplicar cambios y comprobar puerto 21
+##############################
+sudo systemctl restart vsftpd
+sudo netstat -ptan | grep :21
+##############################
+-> Prueba desde el cliente en consola: ftp marte (comandos útiles dentro: pwd, ls, cd, mkdir, put, get, bye).
+
+
+###############################################################################################################################################################################
+4. FTPS: Cifrado SSL/TLS (Explícito e Implícito)
+###############################################################################################################################################################################
+
+- Genera el certificado .pem y protege sus permisos:
+---------------------------------------------------------------------------------------------------------------------
+sudo mkdir -p /etc/vsftpd
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem
+sudo chmod 600 /etc/vsftpd/vsftpd.pem
+---------------------------------------------------------------------------------------------------------------------
+
+- Añade el bloque SSL al final de /etc/vsftpd.conf (sudo nano /etc/vsftpd.conf):
+-----------------------------------------------------------
+# Soporte SSL/TLS
+ssl_enable=YES
+#implicit_ssl=YES
+#listen_port=990
+allow_anon_ssl=NO
+force_local_data_ssl=YES
+force_local_logins_ssl=YES
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+ssl_ciphers=HIGH
+rsa_cert_file=/etc/vsftpd/vsftpd.pem
+-----------------------------------------------------------
+-> Si piden FTPS Explícito (Puerto 21): deja comentadas #implicit_ssl=YES y #listen_port=990. En FileZilla/WinSCP usa protocolo FTP explícito sobre TLS y puerto 21.
+-> Si piden FTPS Implícito (Puerto 990): quita la # de implicit_ssl=YES y listen_port=990. En FileZilla/WinSCP usa protocolo FTP implícito sobre TLS y puerto 990.
+
+--> Reinicia y verifica el puerto (:21 o :990) --> sudo systemctl restart vsftpd --> sudo netstat -ptan | grep vsftpd
+
+
+###############################################################################################################################################################################
+5. Servidor SSH (/etc/ssh/sshd_config) y comandos scp
+###############################################################################################################################################################################
+
+A. Puerto personalizado y restricción de usuarios
+- Instala el servidor (si falta) y edita /etc/ssh/sshd_config (terminado en d):
+-------------------------------------------------------
+sudo apt update && sudo apt install -y openssh-server
+sudo nano /etc/ssh/sshd_config
+-------------------------------------------------------
+
+- Descomenta o añade estas líneas:
+------------------------
+Port 2222
+AllowUsers alumno
+------------------------
+
+- Reinicio obligatorio en Ubuntu moderno (ssh.socket) --> sudo systemctl daemon-reload --> sudo systemctl restart ssh.socket --> sudo netstat -ptan | grep :2222
+
+
+B. Acceso mediante clave pública/privada (sin contraseña)
+(Respeta este orden para no quedarte bloqueado fuera del servidor).
+- En el PC Cliente: genera el par de claves (pulsa Enter tres veces) y copia la clave pública al servidor:
+----------------------------------------
+ssh-keygen
+ssh-copy-id -p 2222 alumno@marte
+----------------------------------------
+-> En el PC Cliente: comprueba que ssh -p 2222 alumno@marte entra directo sin pedir contraseña y sal con exit.
+-> En el Servidor (Marte): abre sudo nano /etc/ssh/sshd_config y deja estas dos líneas activas:
+---------------------------------
+PubkeyAuthentication yes
+PasswordAuthentication no
+---------------------------------
+(Comprueba también con grep -rn "PasswordAuthentication" /etc/ssh/sshd_config.d/ que ningún archivo auxiliar tenga PasswordAuthentication yes; si existe, ábrelo con sudo nano y ponlo en no).
+
+- En el Servidor (Marte): reinicia el socket -->  sudo systemctl daemon-reload --> sudo systemctl restart ssh.socket
+
+
+C. Chuleta rápida de comandos desde el Cliente
+(Atención a la letra p: en ssh y ssh-copy-id es -p minúscula; en scp y sftp es -P MAYÚSCULA).
+
+- Conectar por ssh
+---------------------------
+ssh -p 2222 alumno@marte
+---------------------------
+
+- Copiar 2 archivos del cliente al servidor:
+-------------------------------------------------------------------
+scp -P 2222 archivo1.txt archivo2.txt alumno@marte:/home/alumno/
+-------------------------------------------------------------------
+
+- Copiar 1 archivo del servidor al cliente:
+-----------------------------------------------------
+scp -P 2222 alumno@marte:/home/alumno/archivo.txt .
+-----------------------------------------------------
+
+- Copiar una carpeta con subcarpetas del cliente al servidor (-r):
+---------------------------------------------------------
+scp -r -P 2222 carpeta_local alumno@marte:/home/alumno/
+---------------------------------------------------------
+
+
+
+###############################################################################################################################################################################
+6. Errores típicos y solución rápida en el examen
+###############################################################################################################################################################################
+	Error que aparece						Causa								Solución rápida
+
+- vsftpd.service falla (status=2)		Están activos listen=YES y listen_ipv6=YES a la vez.		Comenta #listen_ipv6=YES en /etc/vsftpd.conf y reinicia vsftpd.
+y no abre puerto 21
+
+- 530 Login incorrect con usuarios		Falta pam_service_name=vsftpd tras vaciar el .conf.		Añade pam_service_name=vsftpd al final de /etc/vsftpd.conf.
+locales válidos
+
+- 500 OOPS: refusing to run with writable 	Usuario enjaulado tiene escritura en su carpeta raíz.		Añade allow_writeable_chroot=YES en /etc/vsftpd.conf.
+root inside chroot()
+
+- 500 OOPS: cannot read user list file		El fichero de userlist_file o chroot_list_file no existe.	Créalo con sudo nano /etc/vsftpd.allowed_users.
+
+- Host key verification failed 			Has escrito y en lugar de yes la primera vez.			Repite el comando ssh y escribe la palabra entera yes.
+al conectar por SSH
+
+- SSH sigue escuchando en el 22 		En Ubuntu 24.04 el puerto lo controla ssh.socket.		Ejecuta daemon-reload y systemctl restart ssh.socket
+tras editar sshd_config
